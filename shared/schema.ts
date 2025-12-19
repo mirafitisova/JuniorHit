@@ -14,7 +14,6 @@ export const profiles = pgTable("profiles", {
   location: text("location"),
   availability: text("availability"),
   playStyle: text("play_style"),
-  photoUrl: text("photo_url"), // Added optional photo URL
   createdAt: timestamp("created_at").defaultNow(),
 });
 
