@@ -27,7 +27,7 @@ export default function Dashboard() {
   }
 
   // If no profile, redirect to setup
-  if (!profile) return <Redirect to="/profile-setup" />;
+  if (!profile) return <Redirect to="/onboarding" />;
 
   const upcomingHits = requests?.filter(r => r.status === 'accepted').slice(0, 3) || [];
   const pendingRequests = requests?.filter(r => r.status === 'pending' && r.receiverId === user.id).length || 0;
