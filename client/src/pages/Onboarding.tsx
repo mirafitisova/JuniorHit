@@ -30,11 +30,11 @@ export default function Onboarding() {
 
   // Extend schema to make fields required for onboarding
   const formSchema = insertProfileSchema.omit({ userId: true, photoUrl: true }).extend({
-      utrRating: insertProfileSchema.shape.utrRating.min(1, "UTR must be at least 1").max(16.5, "UTR cannot exceed 16.5"),
-      bio: insertProfileSchema.shape.bio.min(10, "Bio must be at least 10 characters"),
-      location: insertProfileSchema.shape.location.min(3, "Location is required"),
-      playStyle: insertProfileSchema.shape.playStyle.min(3, "Play style is required"),
-      photoUrl: insertProfileSchema.shape.photoUrl.optional(),
+      utrRating: z.number().min(1, "UTR must be at least 1").max(16.5, "UTR cannot exceed 16.5"),
+      bio: z.string().min(10, "Bio must be at least 10 characters"),
+      location: z.string().min(3, "Location is required"),
+      playStyle: z.string().min(3, "Play style is required"),
+      photoUrl: z.string().optional(),
   });
 
   const form = useForm({
