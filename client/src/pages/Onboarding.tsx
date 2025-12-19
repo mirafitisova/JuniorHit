@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
+import { z } from "zod";
 import {
   Form,
   FormControl,
