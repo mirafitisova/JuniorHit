@@ -1,3 +1,4 @@
+import tennisCourtAerial from "@assets/stock_images/aerial_view_of_a_pro_e8ebce63.jpg";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -108,11 +109,10 @@ export default function Landing() {
           ))}
         </div>
         
-        {/* Unsplash decorative image */}
-        <div className="mt-24 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-          {/* Tennis court aerial view abstract */}
+        {/* Decorative image */}
+        <div className="mt-24 rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-muted">
           <img 
-            src="https://pixabay.com/get/g47e92b474014a92265d078b311d1802bb395d69d857e91732324962f524ab3dfbfdfce17d59e3d0949404a258a6fb4463853aab492352937ef91e097741e1ef1_1280.jpg" 
+            src={tennisCourtAerial} 
             alt="Tennis court aerial" 
             className="w-full h-64 md:h-96 object-cover hover:scale-105 transition-transform duration-700"
           />
