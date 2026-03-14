@@ -36,11 +36,18 @@ export function registerAuthRoutes(app: Express): void {
 
       req.session.regenerate((err) => {
         if (err) {
+          console.error("Session regenerate error:", err);
           return res.status(500).json({ message: "Session error" });
         }
         (req.session as any).userId = user.id;
-        const { passwordHash: _, ...safeUser } = user;
-        return res.status(201).json(safeUser);
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Session save error:", saveErr);
+            return res.status(500).json({ message: "Session error" });
+          }
+          const { passwordHash: _, ...safeUser } = user;
+          return res.status(201).json(safeUser);
+        });
       });
       return;
     } catch (err) {
@@ -68,11 +75,18 @@ export function registerAuthRoutes(app: Express): void {
 
       req.session.regenerate((err) => {
         if (err) {
+          console.error("Session regenerate error:", err);
           return res.status(500).json({ message: "Session error" });
         }
         (req.session as any).userId = user.id;
-        const { passwordHash: _, ...safeUser } = user;
-        return res.json(safeUser);
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Session save error:", saveErr);
+            return res.status(500).json({ message: "Session error" });
+          }
+          const { passwordHash: _, ...safeUser } = user;
+          return res.json(safeUser);
+        });
       });
       return;
     } catch (err) {
@@ -99,7 +113,8 @@ export function registerAuthRoutes(app: Express): void {
       const userId = (req.session as any).userId;
       const user = await authStorage.getUser(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        req.session.destroy(() => {});
+        return res.status(401).json({ message: "Unauthorized" });
       }
       const { passwordHash: _, ...safeUser } = user;
       return res.json(safeUser);
