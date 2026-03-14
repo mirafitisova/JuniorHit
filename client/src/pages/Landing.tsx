@@ -1,4 +1,4 @@
-import tennisCourtAerial from "@assets/generated_images/tennis_court_hero.png";
+import tennisCourtAerial from "@assets/stock_images/tennis_balls_court_2.jpg";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
