@@ -45,7 +45,7 @@ export default function Landing() {
             transition={{ duration: 0.5 }}
           >
             <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent-foreground text-sm font-bold tracking-wide uppercase border border-accent/20 mb-4">
-              For Junior USTA Players
+              For Tennis Players
             </span>
             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-primary leading-tight">
               Find your next <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 relative">
