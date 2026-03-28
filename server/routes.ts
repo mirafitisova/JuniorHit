@@ -57,11 +57,14 @@ export async function registerRoutes(
   app.post(api.hitRequests.create.path, isAuthenticated, async (req, res) => {
     try {
       const requesterId = (req.session as any).userId;
-      const input = api.hitRequests.create.input.parse({
-          ...req.body,
-          requesterId: requesterId
-      });
-      
+      const body = { ...req.body, requesterId };
+
+      // Coerce scheduledTime string → Date if present
+      if (body.scheduledTime && typeof body.scheduledTime === "string") {
+        body.scheduledTime = new Date(body.scheduledTime);
+      }
+
+      const input = api.hitRequests.create.input.parse(body);
       const request = await storage.createHitRequest(input);
       res.status(201).json(request);
     } catch (err) {
