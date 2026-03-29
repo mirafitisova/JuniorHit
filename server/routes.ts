@@ -5,6 +5,10 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import { isAuthenticated } from "./replit_integrations/auth";
+import { db } from "./db";
+import { users } from "@shared/models/auth";
+import { eq } from "drizzle-orm";
+import { sendHitRequestEmail } from "./email";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -67,6 +71,26 @@ export async function registerRoutes(
       const input = api.hitRequests.create.input.parse(body);
       const request = await storage.createHitRequest(input);
       res.status(201).json(request);
+
+      // Send email notification to receiver (non-blocking, best-effort)
+      try {
+        const [receiverUser] = await db.select().from(users).where(eq(users.id, input.receiverId)).limit(1);
+        const requesterProfile = await storage.getProfile(requesterId);
+        const [requesterUser] = await db.select().from(users).where(eq(users.id, requesterId)).limit(1);
+
+        if (receiverUser?.email) {
+          await sendHitRequestEmail({
+            toEmail: receiverUser.email,
+            toFirstName: receiverUser.firstName || "there",
+            fromFirstName: requesterUser?.firstName || "Someone",
+            fromLastName: requesterUser?.lastName || "",
+            fromUtr: requesterProfile?.utrRating ?? null,
+            message: input.message ?? null,
+          });
+        }
+      } catch (emailErr) {
+        console.error("[email] Non-fatal error sending notification:", emailErr);
+      }
     } catch (err) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({

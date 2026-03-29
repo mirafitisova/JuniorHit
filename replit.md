@@ -70,6 +70,13 @@ The `shared/` directory contains code used by both frontend and backend:
 - **lucide-react**: Icon library
 - **Radix UI primitives**: Accessible UI component primitives
 
+### Email Notifications
+- **Service**: Resend (transactional email)
+- **Key**: `RESEND_API_KEY` environment secret
+- **Module**: `server/email.ts` — `sendHitRequestEmail()` called after hit request creation (non-blocking)
+- **Sender**: `onboarding@resend.dev` (Resend sandbox — free tier can only send to the Resend account owner's email; add a verified domain on resend.com to send to any address)
+- **Trigger**: When a player sends a hit request, the receiver gets an email with the requester's name, UTR, and message
+
 ### Build & Development
 - **Vite**: Frontend build tool with HMR
 - **esbuild**: Server bundling for production
