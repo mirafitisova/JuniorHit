@@ -6,93 +6,178 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Check, X, MessageSquare } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Calendar, Clock, MapPin, Check, X, MessageSquare, CalendarPlus, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { Redirect } from "wouter";
+import { useState } from "react";
 
 export default function Requests() {
   const { user } = useAuth();
   const { data: requests, isLoading } = useHitRequests();
   const updateStatus = useUpdateHitRequestStatus();
 
+  // Schedule dialog state
+  const [scheduleDialog, setScheduleDialog] = useState<{ open: boolean; requestId: number | null; partnerName: string }>({
+    open: false, requestId: null, partnerName: ""
+  });
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [scheduleLocation, setScheduleLocation] = useState("");
+
   if (!user) return <Redirect to="/" />;
 
-  // Filter requests
   const received = requests?.filter(r => r.receiverId === user.id) || [];
   const sent = requests?.filter(r => r.requesterId === user.id) || [];
 
-  const RequestCard = ({ req, type }: { req: any, type: 'received' | 'sent' }) => {
-    const isReceived = type === 'received';
+  const openAcceptDialog = (requestId: number, partnerName: string) => {
+    setScheduleTime("");
+    setScheduleLocation("");
+    setScheduleDialog({ open: true, requestId, partnerName });
+  };
+
+  const handleAccept = (skipSchedule = false) => {
+    if (!scheduleDialog.requestId) return;
+    updateStatus.mutate({
+      id: scheduleDialog.requestId,
+      status: "accepted",
+      scheduledTime: (!skipSchedule && scheduleTime) ? scheduleTime : undefined,
+      location: (!skipSchedule && scheduleLocation) ? scheduleLocation : undefined,
+    }, {
+      onSuccess: () => setScheduleDialog({ open: false, requestId: null, partnerName: "" }),
+    });
+  };
+
+  const handleAddSchedule = (requestId: number) => {
+    const req = requests?.find(r => r.id === requestId);
+    const partner = req?.requester;
+    setScheduleTime("");
+    setScheduleLocation("");
+    setScheduleDialog({
+      open: true,
+      requestId,
+      partnerName: `${partner?.user?.firstName} ${partner?.user?.lastName}`,
+    });
+  };
+
+  const handleSaveSchedule = () => {
+    if (!scheduleDialog.requestId) return;
+    updateStatus.mutate({
+      id: scheduleDialog.requestId,
+      status: "accepted",
+      scheduledTime: scheduleTime || undefined,
+      location: scheduleLocation || undefined,
+    }, {
+      onSuccess: () => setScheduleDialog({ open: false, requestId: null, partnerName: "" }),
+    });
+  };
+
+  const RequestCard = ({ req, type }: { req: any; type: "received" | "sent" }) => {
+    const isReceived = type === "received";
     const partner = isReceived ? req.requester : req.receiver;
-    const partnerName = `${partner?.user?.firstName} ${partner?.user?.lastName}`;
+    const partnerName = `${partner?.user?.firstName || ""} ${partner?.user?.lastName || ""}`.trim();
+    const hasSchedule = req.scheduledTime || req.location;
 
     return (
-      <Card className="rounded-2xl border-0 shadow-sm hover:shadow-md transition-shadow mb-4 bg-white">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex items-start gap-4 flex-1">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={partner?.user?.profileImageUrl} />
-                <AvatarFallback>{partner?.user?.firstName?.[0]}</AvatarFallback>
-              </Avatar>
-              
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-lg font-display">
-                    {isReceived ? `Request from ${partnerName}` : `Request to ${partnerName}`}
-                  </h3>
-                  <Badge variant="outline" className={`
-                    capitalize border-0 font-bold px-3 py-1
-                    ${req.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : ''}
-                    ${req.status === 'accepted' ? 'bg-green-100 text-green-700' : ''}
-                    ${req.status === 'rejected' ? 'bg-red-100 text-red-700' : ''}
-                  `}>
-                    {req.status}
-                  </Badge>
-                </div>
-                
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-primary" />
-                    {req.scheduledTime ? format(new Date(req.scheduledTime), 'MMM d, yyyy') : 'TBD'}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-primary" />
-                    {req.scheduledTime ? format(new Date(req.scheduledTime), 'h:mm a') : 'TBD'}
-                  </div>
-                  {req.location && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-primary" />
-                      {req.location}
-                    </div>
+      <Card className="rounded-2xl border-0 shadow-sm hover:shadow-md transition-shadow bg-white">
+        <CardContent className="p-5 md:p-6">
+          <div className="flex flex-col gap-4">
+            {/* Top row: avatar + name + status */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-11 h-11 shrink-0">
+                  <AvatarImage src={partner?.user?.profileImageUrl} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                    {partner?.user?.firstName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-bold text-base font-display leading-tight">{partnerName}</p>
+                  {partner?.utrRating && (
+                    <p className="text-xs text-muted-foreground">UTR {partner.utrRating}</p>
                   )}
                 </div>
-
-                {req.message && (
-                  <div className="mt-3 p-3 bg-muted/50 rounded-xl text-sm flex gap-3">
-                    <MessageSquare className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                    <p className="text-muted-foreground italic">"{req.message}"</p>
-                  </div>
-                )}
               </div>
+              <Badge className={`shrink-0 capitalize border-0 font-semibold px-3 py-1 text-xs
+                ${req.status === "pending" ? "bg-yellow-100 text-yellow-700" : ""}
+                ${req.status === "accepted" ? "bg-green-100 text-green-700" : ""}
+                ${req.status === "rejected" ? "bg-red-100 text-red-700" : ""}
+                ${req.status === "completed" ? "bg-blue-100 text-blue-700" : ""}
+              `}>
+                {req.status === "accepted" ? "✓ Accepted" : req.status}
+              </Badge>
             </div>
 
-            {isReceived && req.status === 'pending' && (
-              <div className="flex md:flex-col gap-2 justify-center border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-6 mt-4 md:mt-0">
-                <Button 
-                  className="flex-1 md:w-32 bg-primary hover:bg-primary/90"
-                  onClick={() => updateStatus.mutate({ id: req.id, status: 'accepted' })}
+            {/* Message */}
+            {req.message && (
+              <div className="flex gap-2.5 bg-muted/50 rounded-xl p-3">
+                <MessageSquare className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                <p className="text-sm text-muted-foreground italic">"{req.message}"</p>
+              </div>
+            )}
+
+            {/* Schedule details for accepted requests */}
+            {req.status === "accepted" && (
+              <div className="bg-green-50 rounded-xl p-3 flex flex-wrap gap-x-5 gap-y-1.5 items-center justify-between">
+                <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+                  <div className="flex items-center gap-1.5 text-sm text-green-800">
+                    <Calendar className="w-4 h-4" />
+                    {req.scheduledTime
+                      ? format(new Date(req.scheduledTime), "EEE, MMM d")
+                      : <span className="italic text-green-600">Date TBD</span>}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-green-800">
+                    <Clock className="w-4 h-4" />
+                    {req.scheduledTime
+                      ? format(new Date(req.scheduledTime), "h:mm a")
+                      : <span className="italic text-green-600">Time TBD</span>}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-green-800">
+                    <MapPin className="w-4 h-4" />
+                    {req.location
+                      ? req.location
+                      : <span className="italic text-green-600">Location TBD</span>}
+                  </div>
+                </div>
+                {!hasSchedule && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-green-700 border-green-200 hover:bg-green-100 rounded-lg text-xs h-8"
+                    onClick={() => handleAddSchedule(req.id)}
+                    data-testid={`button-add-schedule-${req.id}`}
+                  >
+                    <CalendarPlus className="w-3.5 h-3.5 mr-1.5" /> Add Schedule
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Actions for received pending requests */}
+            {isReceived && req.status === "pending" && (
+              <div className="flex gap-2 pt-1">
+                <Button
+                  className="flex-1 bg-primary hover:bg-primary/90 rounded-xl"
+                  onClick={() => openAcceptDialog(req.id, partnerName)}
                   disabled={updateStatus.isPending}
+                  data-testid={`button-accept-${req.id}`}
                 >
-                  <Check className="w-4 h-4 mr-2" /> Accept
+                  <Check className="w-4 h-4 mr-1.5" /> Accept
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex-1 md:w-32 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
-                  onClick={() => updateStatus.mutate({ id: req.id, status: 'rejected' })}
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  onClick={() => updateStatus.mutate({ id: req.id, status: "rejected" })}
                   disabled={updateStatus.isPending}
+                  data-testid={`button-decline-${req.id}`}
                 >
-                  <X className="w-4 h-4 mr-2" /> Decline
+                  <X className="w-4 h-4 mr-1.5" /> Decline
                 </Button>
               </div>
             )}
@@ -106,45 +191,114 @@ export default function Requests() {
     <div className="min-h-screen bg-muted/30">
       <Navigation />
       <main className="md:pl-64 pb-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <h1 className="text-3xl font-display font-bold text-primary mb-8">Hit Requests</h1>
 
           <Tabs defaultValue="received" className="w-full">
-            <TabsList className="mb-6 bg-white p-1 rounded-2xl border shadow-sm w-full md:w-auto">
-              <TabsTrigger value="received" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
-                Received ({received.filter(r => r.status === 'pending').length})
+            <TabsList className="mb-6 bg-white p-1 rounded-2xl border shadow-sm w-full">
+              <TabsTrigger value="received" className="flex-1 rounded-xl py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
+                Received {received.filter(r => r.status === "pending").length > 0 && (
+                  <span className="ml-1.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {received.filter(r => r.status === "pending").length}
+                  </span>
+                )}
               </TabsTrigger>
-              <TabsTrigger value="sent" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
-                Sent ({sent.length})
+              <TabsTrigger value="sent" className="flex-1 rounded-xl py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
+                Sent
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="received" className="space-y-4">
-              {isLoading ? <div>Loading...</div> : 
-                received.length > 0 ? (
-                  received.map(req => <RequestCard key={req.id} req={req} type="received" />)
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground bg-white rounded-3xl border border-dashed">
-                    <p>No received requests yet.</p>
-                  </div>
-                )
-              }
+            <TabsContent value="received" className="space-y-3">
+              {isLoading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+              ) : received.length > 0 ? (
+                received.map(req => <RequestCard key={req.id} req={req} type="received" />)
+              ) : (
+                <div className="text-center py-16 text-muted-foreground bg-white rounded-3xl border border-dashed">
+                  <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="font-medium">No requests yet</p>
+                  <p className="text-sm mt-1">When players request to hit with you, they'll appear here.</p>
+                </div>
+              )}
             </TabsContent>
-            
-            <TabsContent value="sent" className="space-y-4">
-              {isLoading ? <div>Loading...</div> : 
-                sent.length > 0 ? (
-                  sent.map(req => <RequestCard key={req.id} req={req} type="sent" />)
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground bg-white rounded-3xl border border-dashed">
-                    <p>You haven't sent any requests yet.</p>
-                  </div>
-                )
-              }
+
+            <TabsContent value="sent" className="space-y-3">
+              {isLoading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+              ) : sent.length > 0 ? (
+                sent.map(req => <RequestCard key={req.id} req={req} type="sent" />)
+              ) : (
+                <div className="text-center py-16 text-muted-foreground bg-white rounded-3xl border border-dashed">
+                  <Calendar className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="font-medium">No sent requests</p>
+                  <p className="text-sm mt-1">Find players and send your first request!</p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
       </main>
+
+      {/* Accept & Schedule Dialog */}
+      <Dialog open={scheduleDialog.open} onOpenChange={(open) => setScheduleDialog(s => ({ ...s, open }))}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">
+              Hit with {scheduleDialog.partnerName}!
+            </DialogTitle>
+            <DialogDescription>
+              Set a time and place — or skip and sort it out later.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold flex items-center gap-2 text-primary">
+                <Calendar className="w-4 h-4" /> Date & Time
+              </label>
+              <Input
+                type="datetime-local"
+                className="rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary/30"
+                value={scheduleTime}
+                onChange={e => setScheduleTime(e.target.value)}
+                data-testid="input-schedule-time"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold flex items-center gap-2 text-primary">
+                <MapPin className="w-4 h-4" /> Location
+              </label>
+              <Input
+                placeholder="e.g. Flushing Meadows Tennis Center"
+                className="rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary/30"
+                value={scheduleLocation}
+                onChange={e => setScheduleLocation(e.target.value)}
+                data-testid="input-schedule-location"
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1 rounded-xl"
+                onClick={() => handleAccept(true)}
+                disabled={updateStatus.isPending}
+                data-testid="button-accept-skip-schedule"
+              >
+                Skip for now
+              </Button>
+              <Button
+                className="flex-1 rounded-xl"
+                onClick={() => handleAccept(false)}
+                disabled={updateStatus.isPending}
+                data-testid="button-accept-with-schedule"
+              >
+                {updateStatus.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Accept & Schedule"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

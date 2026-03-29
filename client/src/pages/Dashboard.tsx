@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trophy, MapPin, Calendar, Clock, ArrowUpRight } from "lucide-react";
+import { Trophy, MapPin, Calendar, Clock, ArrowUpRight, UserCircle } from "lucide-react";
 import { Link, Redirect } from "wouter";
 import { format } from "date-fns";
 
@@ -26,9 +26,6 @@ export default function Dashboard() {
     );
   }
 
-  // If no profile, redirect to setup
-  if (!profile) return <Redirect to="/onboarding" />;
-
   const upcomingHits = requests?.filter(r => r.status === 'accepted').slice(0, 3) || [];
   const pendingRequests = requests?.filter(r => r.status === 'pending' && r.receiverId === user.id).length || 0;
 
@@ -43,7 +40,7 @@ export default function Dashboard() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-display font-bold text-primary">
-                Welcome back, {user.firstName}!
+                Welcome{profile ? " back" : ""}, {user.firstName}!
               </h1>
               <p className="text-muted-foreground mt-1">
                 Ready to find your next hitting partner?
@@ -55,6 +52,22 @@ export default function Dashboard() {
               </Button>
             </Link>
           </div>
+
+          {/* Soft profile completion prompt */}
+          {!profile && (
+            <div className="flex items-center justify-between gap-4 bg-accent/10 border border-accent/20 rounded-2xl px-5 py-4">
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-8 h-8 text-primary shrink-0" />
+                <div>
+                  <p className="font-semibold text-primary">Finish setting up your profile</p>
+                  <p className="text-sm text-muted-foreground">Add your UTR and location so other players can find you.</p>
+                </div>
+              </div>
+              <Link href="/onboarding">
+                <Button size="sm" className="shrink-0">Complete Profile</Button>
+              </Link>
+            </div>
+          )}
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Profile Summary Card */}
@@ -75,20 +88,22 @@ export default function Dashboard() {
                     <h2 className="text-2xl font-bold font-display">{user.firstName} {user.lastName}</h2>
                     <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
                       <MapPin className="w-4 h-4" />
-                      {profile.location || "Location not set"}
+                      {profile?.location || "Location not set"}
                     </div>
                   </div>
                   <div className="bg-accent/10 text-accent-foreground px-4 py-2 rounded-xl border border-accent/20 flex flex-col items-center">
                     <span className="text-xs font-bold uppercase tracking-wider opacity-70">UTR</span>
-                    <span className="text-2xl font-display font-bold text-primary">{profile.utrRating || "-"}</span>
+                    <span className="text-2xl font-display font-bold text-primary">{profile?.utrRating || "-"}</span>
                   </div>
                 </div>
                 <p className="text-muted-foreground line-clamp-2 mb-6">
-                  {profile.bio || "No bio yet. Add one to let others know your play style!"}
+                  {profile?.bio || "No bio yet. Add one to let others know your play style!"}
                 </p>
                 <div className="flex gap-3">
-                  <Link href="/profile">
-                    <Button variant="outline" size="sm" className="rounded-xl">Edit Profile</Button>
+                  <Link href={profile ? "/profile" : "/onboarding"}>
+                    <Button variant="outline" size="sm" className="rounded-xl">
+                      {profile ? "Edit Profile" : "Set Up Profile"}
+                    </Button>
                   </Link>
                   {pendingRequests > 0 && (
                     <Link href="/requests">

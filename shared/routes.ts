@@ -66,7 +66,11 @@ export const api = {
     updateStatus: {
       method: 'PATCH' as const,
       path: '/api/hit-requests/:id/status',
-      input: z.object({ status: z.enum(['accepted', 'rejected', 'completed']) }),
+      input: z.object({
+        status: z.enum(['accepted', 'rejected', 'completed']),
+        scheduledTime: z.string().optional(),
+        location: z.string().optional(),
+      }),
       responses: {
         200: z.custom<typeof hitRequests.$inferSelect>(),
         404: errorSchemas.notFound,

@@ -105,14 +105,18 @@ export async function registerRoutes(
   app.patch(api.hitRequests.updateStatus.path, isAuthenticated, async (req, res) => {
       try {
         const userId = (req.session as any).userId;
-        const { status } = req.body;
+        const { status, scheduledTime, location } = req.body;
         const requests = await storage.getHitRequests(userId);
         const request = requests.find(r => r.id === Number(req.params.id));
         if (!request) return res.status(404).json({ message: "Request not found" });
         if (request.requesterId !== userId && request.receiverId !== userId) {
           return res.status(403).json({ message: "Not authorized" });
         }
-        const updated = await storage.updateHitRequestStatus(Number(req.params.id), status);
+        const scheduling = {
+          scheduledTime: scheduledTime ? new Date(scheduledTime) : undefined,
+          location: location || undefined,
+        };
+        const updated = await storage.updateHitRequestStatus(Number(req.params.id), status, scheduling);
         if (!updated) return res.status(404).json({ message: "Request not found" });
         res.json(updated);
       } catch (err) {

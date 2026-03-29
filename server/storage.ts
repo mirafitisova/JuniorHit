@@ -108,9 +108,12 @@ export class DatabaseStorage implements IStorage {
     return newRequest;
   }
 
-  async updateHitRequestStatus(id: number, status: string): Promise<HitRequest | undefined> {
+  async updateHitRequestStatus(id: number, status: string, scheduling?: { scheduledTime?: Date; location?: string }): Promise<HitRequest | undefined> {
+    const updates: Partial<HitRequest> = { status };
+    if (scheduling?.scheduledTime) updates.scheduledTime = scheduling.scheduledTime;
+    if (scheduling?.location) updates.location = scheduling.location;
     const [updated] = await db.update(hitRequests)
-      .set({ status })
+      .set(updates)
       .where(eq(hitRequests.id, id))
       .returning();
     return updated;

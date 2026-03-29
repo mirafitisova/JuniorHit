@@ -59,8 +59,8 @@ export function useUpdateHitRequestStatus() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: number } & UpdateHitRequestStatus) => {
-      const validated = api.hitRequests.updateStatus.input.parse({ status });
+    mutationFn: async ({ id, status, scheduledTime, location }: { id: number; scheduledTime?: string; location?: string } & UpdateHitRequestStatus) => {
+      const validated = api.hitRequests.updateStatus.input.parse({ status, scheduledTime, location });
       const url = buildUrl(api.hitRequests.updateStatus.path, { id });
       
       const res = await fetch(url, {
