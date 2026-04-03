@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getApiUrl } from "@/lib/queryClient";
 
 type User = {
   id: string;
@@ -12,7 +12,7 @@ type User = {
 };
 
 async function fetchUser(): Promise<User | null> {
-  const response = await fetch("/api/auth/user", {
+  const response = await fetch(getApiUrl("/api/auth/user"), {
     credentials: "include",
   });
 

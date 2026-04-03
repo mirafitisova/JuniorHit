@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 import { type InsertProfile, type UpdateProfileRequest } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { getApiUrl } from "@/lib/queryClient";
 
 export function useProfiles(filters?: { search?: string; minUtr?: string; maxUtr?: string }) {
   // Convert filters to query string params, removing undefined/empty
@@ -16,7 +17,7 @@ export function useProfiles(filters?: { search?: string; minUtr?: string; maxUtr
   return useQuery({
     queryKey,
     queryFn: async () => {
-      const url = `${api.profiles.list.path}?${queryString}`;
+      const url = getApiUrl(`${api.profiles.list.path}?${queryString}`);
       const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch profiles");
       return api.profiles.list.responses[200].parse(await res.json());
@@ -29,7 +30,7 @@ export function useProfile(userId: string) {
     queryKey: [api.profiles.get.path, userId],
     queryFn: async () => {
       if (!userId) return null;
-      const url = buildUrl(api.profiles.get.path, { userId });
+      const url = getApiUrl(buildUrl(api.profiles.get.path, { userId }));
       const res = await fetch(url, { credentials: "include" });
       if (res.status === 404) return null;
       if (!res.ok) throw new Error("Failed to fetch profile");
@@ -47,7 +48,7 @@ export function useUpdateProfile() {
     mutationFn: async (updates: UpdateProfileRequest) => {
       // Input is partial, so we validate with partial schema
       const validated = api.profiles.update.input.parse(updates);
-      const res = await fetch(api.profiles.update.path, {
+      const res = await fetch(getApiUrl(api.profiles.update.path), {
         method: api.profiles.update.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
