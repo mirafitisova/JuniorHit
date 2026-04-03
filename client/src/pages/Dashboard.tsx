@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trophy, MapPin, Calendar, Clock, ArrowUpRight, UserCircle } from "lucide-react";
+import { Trophy, MapPin, Calendar, Clock, ArrowUpRight, ArrowRight, UserCircle } from "lucide-react";
 import { Link, Redirect } from "wouter";
 import { format } from "date-fns";
 
