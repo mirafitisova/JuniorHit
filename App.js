@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>JuniorHit Mobile</Text>
+      <Text style={styles.title}>CourtMatch Mobile</Text>
       <Text style={styles.subtitle}>Find your next hitting partner</Text>
       <Button
         title="Get Started"
@@ -24,7 +24,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'JuniorHit' }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'CourtMatch' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

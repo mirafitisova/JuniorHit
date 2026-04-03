@@ -19,7 +19,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-display font-bold text-2xl text-primary">
             <Trophy className="w-8 h-8 text-accent" />
-            <span>JuniorHit</span>
+            <span>CourtMatch</span>
           </div>
           <div className="flex gap-4">
             <Link href="/auth">
@@ -27,7 +27,7 @@ export default function Landing() {
                 Log In
               </Button>
             </Link>
-            <Link href="/auth">
+            <Link href="/signup">
               <Button className="bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20" data-testid="button-signup">
                 Sign Up
               </Button>
@@ -69,7 +69,7 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="h-14 px-8 text-lg bg-primary hover:bg-primary/90 shadow-xl shadow-primary/25 rounded-2xl" data-testid="button-get-started">
                 Get Started <ArrowRight className="ml-2 w-5 h-5" />
               </Button>

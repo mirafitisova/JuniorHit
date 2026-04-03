@@ -18,6 +18,11 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  dateOfBirth: varchar("date_of_birth"),
+  zipCode: varchar("zip_code"),
+  parentEmail: varchar("parent_email"),
+  accountStatus: varchar("account_status").notNull().default("ACTIVE"),
+  guidelinesAcceptedAt: timestamp("guidelines_accepted_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -45,7 +45,7 @@ export function Navigation() {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-md border-b z-50 flex items-center justify-between px-4">
         <div className="flex items-center gap-2 font-display font-bold text-xl text-primary">
           <Trophy className="w-6 h-6 text-accent" />
-          <span>JuniorHit</span>
+          <span>CourtMatch</span>
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
@@ -57,7 +57,7 @@ export function Navigation() {
             <div className="p-6 border-b">
               <div className="flex items-center gap-2 font-display font-bold text-2xl text-primary mb-6">
                 <Trophy className="w-8 h-8 text-accent" />
-                <span>JuniorHit</span>
+                <span>CourtMatch</span>
               </div>
               {user && (
                 <div className="flex items-center gap-3">
@@ -98,7 +98,7 @@ export function Navigation() {
           <Link href="/">
             <div className="flex items-center gap-2 font-display font-bold text-2xl text-primary cursor-pointer">
               <Trophy className="w-8 h-8 text-accent" />
-              <span>JuniorHit</span>
+              <span>CourtMatch</span>
             </div>
           </Link>
         </div>

@@ -21,9 +21,9 @@ export async function sendHitRequestEmail(opts: HitRequestEmailOptions) {
 
   try {
     await resend.emails.send({
-      from: "JuniorHit <onboarding@resend.dev>",
+      from: "CourtMatch <onboarding@resend.dev>",
       to: toEmail,
-      subject: `${fromFirstName} wants to hit with you on JuniorHit!`,
+      subject: `${fromFirstName} wants to hit with you on CourtMatch!`,
       html: `
         <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #f9fafb;">
           <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
@@ -40,7 +40,7 @@ export async function sendHitRequestEmail(opts: HitRequestEmailOptions) {
             </div>` : ""}
 
             <p style="color: #6b7280; font-size: 14px; margin: 0 0 24px;">
-              Log in to JuniorHit to accept or decline this request.
+              Log in to CourtMatch to accept or decline this request.
             </p>
 
             <a href="https://juniorhit.onrender.com/requests"
@@ -49,7 +49,7 @@ export async function sendHitRequestEmail(opts: HitRequestEmailOptions) {
             </a>
           </div>
           <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">
-            JuniorHit · Tennis Partner Finder
+            CourtMatch · Find your next hitting partner
           </p>
         </div>
       `,

@@ -1,8 +1,8 @@
-# JuniorHit - Tennis Hitting Partner Platform
+# CourtMatch - Tennis Hitting Partner Platform
 
 ## Overview
 
-JuniorHit is a web and mobile application designed to help junior USTA tennis players find hitting partners. The platform allows players to create profiles with their UTR (Universal Tennis Rating), search for compatible partners, and schedule hitting sessions through a request system.
+CourtMatch is a web and mobile application designed to help junior USTA tennis players find hitting partners. The platform allows players to create profiles with their UTR (Universal Tennis Rating), search for compatible partners, and schedule hitting sessions through a request system.
 
 ## User Preferences
 

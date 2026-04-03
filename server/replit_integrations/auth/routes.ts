@@ -9,7 +9,21 @@ const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date of birth"),
+  zipCode: z.string().regex(/^\d{5}$/, "Zip code must be 5 digits"),
+  parentEmail: z.string().email("Invalid parent/guardian email").optional(),
 });
+
+function calculateAge(dob: string): number {
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -21,35 +35,41 @@ export function registerAuthRoutes(app: Express): void {
     try {
       const input = registerSchema.parse(req.body);
 
+      const age = calculateAge(input.dateOfBirth);
+
+      if (age < 13) {
+        return res.status(400).json({ message: "CourtMatch is for players 13 and older" });
+      }
+
+      if (age < 18 && !input.parentEmail) {
+        return res.status(400).json({
+          message: "A parent/guardian email is required for players under 18",
+          field: "parentEmail",
+        });
+      }
+
       const existing = await authStorage.getUserByEmail(input.email);
       if (existing) {
         return res.status(400).json({ message: "Email already registered" });
       }
 
       const passwordHash = await bcrypt.hash(input.password, 10);
+      const needsParentApproval = age < 18;
+
       const user = await authStorage.createUser({
         email: input.email,
         passwordHash,
         firstName: input.firstName,
         lastName: input.lastName,
+        dateOfBirth: input.dateOfBirth,
+        zipCode: input.zipCode,
+        parentEmail: input.parentEmail ?? null,
+        accountStatus: needsParentApproval ? "PENDING" : "ACTIVE",
+        guidelinesAcceptedAt: new Date(),
       });
 
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error("Session regenerate error:", err);
-          return res.status(500).json({ message: "Session error" });
-        }
-        (req.session as any).userId = user.id;
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error("Session save error:", saveErr);
-            return res.status(500).json({ message: "Session error" });
-          }
-          const { passwordHash: _, ...safeUser } = user;
-          return res.status(201).json(safeUser);
-        });
-      });
-      return;
+      const { passwordHash: _, ...safeUser } = user;
+      return res.status(201).json({ ...safeUser, needsParentApproval });
     } catch (err) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0].message });
@@ -71,6 +91,12 @@ export function registerAuthRoutes(app: Express): void {
       const valid = await bcrypt.compare(input.password, user.passwordHash);
       if (!valid) {
         return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      if (user.accountStatus === "PENDING") {
+        return res.status(403).json({
+          message: "Your account is pending parent approval. Please ask your parent to check their email.",
+        });
       }
 
       req.session.regenerate((err) => {

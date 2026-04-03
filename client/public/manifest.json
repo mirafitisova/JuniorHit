@@ -1,6 +1,6 @@
 {
-  "name": "JuniorHit",
-  "short_name": "JuniorHit",
+  "name": "CourtMatch",
+  "short_name": "CourtMatch",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

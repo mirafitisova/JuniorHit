@@ -58,7 +58,7 @@ export default function Onboarding() {
       }
       toast({
         title: "Profile Created!",
-        description: "Welcome to JuniorHit. Let's find some partners!",
+        description: "Welcome to CourtMatch. Let's find some partners!",
       });
       setRedirect(true);
     },
