@@ -2,13 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 import { type InsertHitRequest, type UpdateHitRequestStatus } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { getApiUrl } from "@/lib/queryClient";
 
 export function useHitRequests() {
   return useQuery({
     queryKey: [api.hitRequests.list.path],
     queryFn: async () => {
-      const res = await fetch(getApiUrl(api.hitRequests.list.path), { credentials: "include" });
+      const res = await fetch(api.hitRequests.list.path, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch hit requests");
       return api.hitRequests.list.responses[200].parse(await res.json());
     },
@@ -22,7 +21,7 @@ export function useCreateHitRequest() {
   return useMutation({
     mutationFn: async (data: InsertHitRequest) => {
       const validated = api.hitRequests.create.input.parse(data);
-      const res = await fetch(getApiUrl(api.hitRequests.create.path), {
+      const res = await fetch(api.hitRequests.create.path, {
         method: api.hitRequests.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
@@ -62,7 +61,7 @@ export function useUpdateHitRequestStatus() {
   return useMutation({
     mutationFn: async ({ id, status, scheduledTime, location }: { id: number; scheduledTime?: string; location?: string } & UpdateHitRequestStatus) => {
       const validated = api.hitRequests.updateStatus.input.parse({ status, scheduledTime, location });
-      const url = getApiUrl(buildUrl(api.hitRequests.updateStatus.path, { id }));
+      const url = buildUrl(api.hitRequests.updateStatus.path, { id });
 
       const res = await fetch(url, {
         method: api.hitRequests.updateStatus.method,
