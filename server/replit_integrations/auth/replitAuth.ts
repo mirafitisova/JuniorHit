@@ -11,6 +11,7 @@ export function getSession() {
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 30000,
     max: 5,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
   });
   const sessionStore = new pgStore({
     pool,

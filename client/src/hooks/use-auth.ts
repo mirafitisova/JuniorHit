@@ -12,19 +12,33 @@ type User = {
 };
 
 async function fetchUser(): Promise<User | null> {
-  const response = await fetch("/api/auth/user", {
-    credentials: "include",
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
-  if (response.status === 401) {
-    return null;
+  try {
+    const response = await fetch("/api/auth/user", {
+      credentials: "include",
+      signal: controller.signal,
+    });
+
+    if (response.status === 401) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (err: any) {
+    if (err.name === "AbortError") {
+      console.error("[auth] /api/auth/user timed out after 15s");
+      return null;
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (!response.ok) {
-    throw new Error(`${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
 }
 
 export function useAuth() {
