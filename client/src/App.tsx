@@ -15,6 +15,7 @@ import AuthPage from "@/pages/AuthPage";
 import SignupPage from "@/pages/SignupPage";
 import SignupSuccess from "@/pages/SignupSuccess";
 import SafetyGuidelines from "@/pages/SafetyGuidelines";
+import ParentApprovePage from "@/pages/ParentApprovePage";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/requests" component={Requests} />
       <Route path="/profile-setup" component={ProfileSetup} />
       <Route path="/profile" component={ProfileSetup} />
+      <Route path="/parent-approve/:token" component={ParentApprovePage} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const sessions = pgTable(
   "sessions",
@@ -23,6 +23,13 @@ export const users = pgTable("users", {
   parentEmail: varchar("parent_email"),
   accountStatus: varchar("account_status").notNull().default("ACTIVE"),
   guidelinesAcceptedAt: timestamp("guidelines_accepted_at"),
+  // Email verification
+  emailVerificationToken: varchar("email_verification_token"),
+  emailVerificationExpiry: timestamp("email_verification_expiry"),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  // Parent consent (under-18 users)
+  parentApprovalToken: varchar("parent_approval_token"),
+  parentApprovalSentAt: timestamp("parent_approval_sent_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
