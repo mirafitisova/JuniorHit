@@ -43,7 +43,7 @@ export async function sendHitRequestEmail(opts: HitRequestEmailOptions) {
               Log in to CourtMatch to accept or decline this request.
             </p>
 
-            <a href="https://juniorhit.onrender.com/requests"
+            <a href="https://courtmatch.onrender.com/requests"
                style="display: inline-block; background: #1e3a5f; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
               View Request
             </a>

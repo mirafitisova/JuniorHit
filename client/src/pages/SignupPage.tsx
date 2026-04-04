@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
 
-export const SIGNUP_STORAGE_KEY = "juniorhit_pending_signup";
+export const SIGNUP_STORAGE_KEY = "courtmatch_pending_signup";
 
 export default function SignupPage() {
   const [, navigate] = useLocation();
