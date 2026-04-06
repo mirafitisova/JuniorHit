@@ -50,7 +50,11 @@ export default function SafetyGuidelines() {
       const res = await apiRequest("POST", "/api/auth/register", formData);
       const data = await res.json();
       sessionStorage.removeItem(SIGNUP_STORAGE_KEY);
-      navigate("/signup/success");
+      if (data.emailWarning) {
+        setError(data.emailWarning);
+      } else {
+        navigate("/signup/success");
+      }
     } catch (err: any) {
       const raw: string = err?.message || "Registration failed";
       try {

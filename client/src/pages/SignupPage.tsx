@@ -67,6 +67,8 @@ export default function SignupPage() {
     if (needsParentEmail) {
       if (!parentEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail))
         errs.parentEmail = "A valid parent/guardian email is required";
+      else if (parentEmail.trim().toLowerCase() === email.trim().toLowerCase())
+        errs.parentEmail = "Parent email must be different from your email address";
     }
     return errs;
   }
@@ -113,7 +115,7 @@ export default function SignupPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
               {/* Name row */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="firstName">First Name</Label>
                   <Input

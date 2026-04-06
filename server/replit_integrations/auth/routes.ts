@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import type { Express } from "express";
+import rateLimit from "express-rate-limit";
 import { authStorage } from "./storage";
 import { isAuthenticated } from "./replitAuth";
 import bcrypt from "bcryptjs";
@@ -8,6 +9,22 @@ import {
   sendVerificationEmail,
   sendParentConsentEmail,
 } from "../../email";
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many sign-in attempts. Please wait 15 minutes and try again." },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many accounts created from this device. Please try again in an hour." },
+});
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,7 +58,7 @@ function getBaseUrl(req: Express["request"]): string {
 
 export function registerAuthRoutes(app: Express): void {
   // ── Register ───────────────────────────────────────────────────────────────
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", registerLimiter, async (req, res) => {
     try {
       const input = registerSchema.parse(req.body);
       const age = calculateAge(input.dateOfBirth);
@@ -53,6 +70,13 @@ export function registerAuthRoutes(app: Express): void {
       if (age < 18 && !input.parentEmail) {
         return res.status(400).json({
           message: "A parent/guardian email is required for players under 18",
+          field: "parentEmail",
+        });
+      }
+
+      if (input.parentEmail && input.parentEmail.toLowerCase() === input.email.toLowerCase()) {
+        return res.status(400).json({
+          message: "Parent email must be different from the player's email address",
           field: "parentEmail",
         });
       }
@@ -81,13 +105,24 @@ export function registerAuthRoutes(app: Express): void {
       const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
       await authStorage.setEmailVerificationToken(user.id, token, expiry);
 
-      // Send verification email (fire-and-forget)
-      sendVerificationEmail({
-        toEmail: user.email,
-        firstName: user.firstName ?? "there",
-        verificationToken: token,
-        baseUrl: getBaseUrl(req),
-      });
+      // Send verification email — await so we can surface failures to the user
+      try {
+        await sendVerificationEmail({
+          toEmail: user.email,
+          firstName: user.firstName ?? "there",
+          verificationToken: token,
+          baseUrl: getBaseUrl(req),
+        });
+      } catch (emailErr) {
+        console.error("[auth] Failed to send verification email:", emailErr);
+        // Account was created — tell the user to contact support rather than silently failing
+        const { passwordHash: _, ...safeUser } = user;
+        return res.status(201).json({
+          ...safeUser,
+          needsEmailVerification: true,
+          emailWarning: "Account created but we couldn't send the verification email. Please contact support.",
+        });
+      }
 
       const { passwordHash: _, ...safeUser } = user;
       return res.status(201).json({ ...safeUser, needsEmailVerification: true });
@@ -201,7 +236,7 @@ export function registerAuthRoutes(app: Express): void {
   });
 
   // ── Login ──────────────────────────────────────────────────────────────────
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", loginLimiter, async (req, res) => {
     try {
       const input = loginSchema.parse(req.body);
 

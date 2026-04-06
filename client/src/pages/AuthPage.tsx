@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation, Link } from "wouter";
+import { useLocation, useSearch, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Trophy, Loader2 } from "lucide-react";
+import { Trophy, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AuthPage() {
@@ -14,6 +14,17 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const { login, isLoggingIn, user } = useAuth();
   const [, navigate] = useLocation();
+  const search = useSearch();
+  const params = new URLSearchParams(search);
+  const verified = params.get("verified") === "1";
+  const tokenError = params.get("error");
+
+  const tokenErrorMessage =
+    tokenError === "token-expired"
+      ? "This verification link has expired. Please sign up again."
+      : tokenError === "invalid-token" || tokenError === "verification-failed"
+      ? "This verification link is invalid or has already been used."
+      : null;
 
   if (user) {
     navigate("/");
@@ -50,6 +61,19 @@ export default function AuthPage() {
           <Trophy className="w-10 h-10 text-primary" />
           <span className="font-display font-bold text-3xl text-primary">CourtMatch</span>
         </div>
+
+        {verified && (
+          <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800 mb-4">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            Email verified! You can now sign in.
+          </div>
+        )}
+        {tokenErrorMessage && (
+          <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive mb-4">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            {tokenErrorMessage}
+          </div>
+        )}
 
         <Card>
           <CardHeader className="text-center">

@@ -40,10 +40,10 @@ export function VerificationEmail({ firstName, verificationUrl }: Props) {
 
 const main: React.CSSProperties = { backgroundColor: "#f9fafb", fontFamily: "sans-serif" };
 const container: React.CSSProperties = { maxWidth: "560px", margin: "0 auto", padding: "32px 24px", backgroundColor: "#ffffff", borderRadius: "16px" };
-const h1: React.CSSProperties = { fontSize: "22px", color: "#1e3a5f", margin: "0 0 16px" };
+const h1: React.CSSProperties = { fontSize: "22px", color: "#2D7A4F", margin: "0 0 16px" };
 const text: React.CSSProperties = { fontSize: "15px", color: "#374151", margin: "0 0 16px", lineHeight: "1.6" };
 const btnSection: React.CSSProperties = { margin: "24px 0" };
-const btn: React.CSSProperties = { backgroundColor: "#1e3a5f", color: "#ffffff", padding: "12px 28px", borderRadius: "8px", fontWeight: "600", fontSize: "15px", textDecoration: "none" };
+const btn: React.CSSProperties = { backgroundColor: "#2D7A4F", color: "#ffffff", padding: "12px 28px", borderRadius: "8px", fontWeight: "600", fontSize: "15px", textDecoration: "none" };
 const hint: React.CSSProperties = { fontSize: "13px", color: "#9ca3af", margin: "16px 0" };
 const hr: React.CSSProperties = { borderColor: "#e5e7eb", margin: "24px 0" };
 const footer: React.CSSProperties = { fontSize: "12px", color: "#9ca3af", textAlign: "center" };

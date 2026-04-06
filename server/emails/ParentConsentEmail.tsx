@@ -89,13 +89,13 @@ export function ParentConsentEmail({ playerFirstName, approvalUrl, isReminder = 
 
 const main: React.CSSProperties = { backgroundColor: "#f9fafb", fontFamily: "sans-serif" };
 const container: React.CSSProperties = { maxWidth: "560px", margin: "0 auto", padding: "32px 24px", backgroundColor: "#ffffff", borderRadius: "16px" };
-const h1: React.CSSProperties = { fontSize: "22px", color: "#1e3a5f", margin: "0 0 16px" };
+const h1: React.CSSProperties = { fontSize: "22px", color: "#2D7A4F", margin: "0 0 16px" };
 const h2: React.CSSProperties = { fontSize: "18px", color: "#374151", margin: "0 0 16px" };
-const sectionTitle: React.CSSProperties = { fontSize: "15px", color: "#1e3a5f", margin: "20px 0 8px" };
+const sectionTitle: React.CSSProperties = { fontSize: "15px", color: "#2D7A4F", margin: "20px 0 8px" };
 const text: React.CSSProperties = { fontSize: "15px", color: "#374151", margin: "0 0 12px", lineHeight: "1.6" };
 const listText: React.CSSProperties = { fontSize: "14px", color: "#374151", margin: "0 0 8px", lineHeight: "1.6", paddingLeft: "4px" };
 const btnSection: React.CSSProperties = { margin: "28px 0" };
-const btn: React.CSSProperties = { backgroundColor: "#1e3a5f", color: "#ffffff", padding: "14px 32px", borderRadius: "8px", fontWeight: "600", fontSize: "16px", textDecoration: "none" };
+const btn: React.CSSProperties = { backgroundColor: "#2D7A4F", color: "#ffffff", padding: "14px 32px", borderRadius: "8px", fontWeight: "600", fontSize: "16px", textDecoration: "none" };
 const hint: React.CSSProperties = { fontSize: "13px", color: "#9ca3af", margin: "16px 0" };
 const hr: React.CSSProperties = { borderColor: "#e5e7eb", margin: "24px 0" };
 const footer: React.CSSProperties = { fontSize: "12px", color: "#9ca3af", textAlign: "center" };
