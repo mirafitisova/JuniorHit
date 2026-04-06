@@ -155,7 +155,7 @@ export default function Dashboard() {
                       );
                     })}
                     <Link href="/requests" className="block text-center mt-4">
-                      <Button variant="link" size="sm" className="text-primary">
+                      <Button variant="ghost" size="sm" className="text-primary">
                         View all <ArrowRight className="w-3 h-3 ml-1" />
                       </Button>
                     </Link>

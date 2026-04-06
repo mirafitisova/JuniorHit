@@ -38,7 +38,7 @@ export class DatabaseStorage implements IStorage {
     .limit(1);
 
     if (result.length === 0) return undefined;
-    return { ...result[0].profile, user: result[0].user };
+    return { ...result[0].profile, user: result[0].user ?? undefined };
   }
 
   async getProfiles(filters?: { search?: string, minUtr?: number, maxUtr?: number }): Promise<ProfileWithUser[]> {
@@ -65,7 +65,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     const results = await query;
-    return results.map(r => ({ ...r.profile, user: r.user }));
+    return results.map(r => ({ ...r.profile, user: r.user ?? undefined }));
   }
 
   async createProfile(profile: InsertProfile): Promise<Profile> {
