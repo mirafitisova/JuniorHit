@@ -3,6 +3,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 export * from "./models/auth";
+export * from "./models/tennis";
 
 // === TABLE DEFINITIONS ===
 
