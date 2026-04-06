@@ -13,8 +13,6 @@
     "db:seed-courts": "tsx server/seed-courts.ts"
   },
   "dependencies": {
-    "@react-email/components": "^0.0.22",
-    "@react-email/render": "^0.0.13",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^1.0.2",
