@@ -309,7 +309,7 @@ function unsubscribeLink(baseUrl: string, token: string, type: string) {
 function footerWithUnsub(baseUrl: string, token: string) {
   return `
     <p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:24px;line-height:1.6;">
-      JuniorHit · Find your next hitting partner<br>
+      CourtMatch · Find your next hitting partner<br>
       <a href="${unsubscribeLink(baseUrl, token, "reengagement")}" style="color:#9ca3af;text-decoration:underline;">
         Unsubscribe from activity reminders
       </a>
@@ -387,7 +387,7 @@ export async function sendReengagement14d(opts: {
   const html = `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#f9fafb;">
       <div style="background:white;border-radius:16px;padding:32px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-        <h1 style="color:#2D7A4F;font-size:22px;margin:0 0 8px;">🌟 We miss you at JuniorHit</h1>
+        <h1 style="color:#2D7A4F;font-size:22px;margin:0 0 8px;">🌟 We miss you at CourtMatch</h1>
         <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 16px;">Hi ${firstName},</p>
         <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 24px;">
           ${newText} Come back and find your next hitting partner.
@@ -397,7 +397,7 @@ export async function sendReengagement14d(opts: {
       ${footerWithUnsub(baseUrl, unsubscribeToken)}
     </div>`;
   try {
-    await resend.emails.send({ from: FROM, to: opts.toEmail, subject: "We miss you at JuniorHit 🌟", html });
+    await resend.emails.send({ from: FROM, to: opts.toEmail, subject: "We miss you at CourtMatch 🌟", html });
   } catch (err) { console.error("[email] 14d reengagement failed:", err); }
 }
 
@@ -439,10 +439,10 @@ export async function sendBroadcastEmail(opts: {
         <h1 style="color:#2D7A4F;font-size:22px;margin:0 0 16px;">🎾 ${title}</h1>
         <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 16px;">Hi ${firstName},</p>
         <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 24px;">${body}</p>
-        ${btn(`${baseUrl}/`, "Open JuniorHit")}
+        ${btn(`${baseUrl}/`, "Open CourtMatch")}
       </div>
       <p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:24px;line-height:1.6;">
-        JuniorHit · Find your next hitting partner<br>
+        CourtMatch · Find your next hitting partner<br>
         <a href="${unsubscribeLink(baseUrl, unsubscribeToken, "marketing")}" style="color:#9ca3af;text-decoration:underline;">
           Unsubscribe from tournament and marketing emails
         </a>

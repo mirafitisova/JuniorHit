@@ -179,7 +179,7 @@ export default function NotificationsAdmin() {
             <div className="space-y-1.5">
               <Label>Message body</Label>
               <Textarea
-                placeholder="The SoCal Closed is coming up. Find a prep partner on JuniorHit to get match-ready!"
+                placeholder="The SoCal Closed is coming up. Find a prep partner on CourtMatch to get match-ready!"
                 value={form.body}
                 onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                 required

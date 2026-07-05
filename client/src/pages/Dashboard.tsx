@@ -60,7 +60,7 @@ export default function Dashboard() {
 
   function shareViaSms() {
     if (!inviteLink) return;
-    const msg = encodeURIComponent(`I'm using JuniorHit to find hitting partners for tennis. Join me! ${inviteLink}`);
+    const msg = encodeURIComponent(`I'm using CourtMatch to find hitting partners for tennis. Join me! ${inviteLink}`);
     window.open(`sms:?body=${msg}`, "_blank");
   }
 

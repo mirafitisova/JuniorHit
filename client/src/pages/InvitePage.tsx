@@ -27,7 +27,7 @@ export default function InvitePage() {
       <nav className="px-6 py-5 flex items-center justify-between max-w-3xl mx-auto">
         <div className="flex items-center gap-2 font-display font-bold text-xl">
           <Trophy className="w-6 h-6 text-accent" />
-          <span>JuniorHit</span>
+          <span>CourtMatch</span>
         </div>
         <Link href="/auth">
           <Button variant="ghost" className="text-white/70 hover:text-white text-sm">
@@ -63,7 +63,7 @@ export default function InvitePage() {
                 <span className="text-3xl">🎾</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-display font-bold leading-tight">
-                {inviterName} invited you to JuniorHit
+                {inviterName} invited you to CourtMatch
               </h1>
               <p className="text-lg text-white/70 leading-relaxed max-w-lg mx-auto">
                 The platform for junior tennis players to find practice partners at their exact skill level — with verified UTR ratings and parent-approved safety.
@@ -74,7 +74,7 @@ export default function InvitePage() {
                   className="h-14 px-10 text-base font-bold bg-accent text-accent-foreground hover:bg-accent/90 rounded-2xl shadow-2xl shadow-accent/20 mt-2"
                   data-testid="button-invite-signup"
                 >
-                  Join {inviterName} on JuniorHit <ArrowRight className="ml-2 w-5 h-5" />
+                  Join {inviterName} on CourtMatch <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
               <p className="text-sm text-white/40">Free to join · No credit card required</p>

@@ -33,7 +33,7 @@ export default function UnsubscribePage() {
         <Link href="/">
           <div className="flex items-center justify-center gap-2 font-display font-bold text-xl text-primary mb-8">
             <Trophy className="w-6 h-6 text-accent" />
-            <span>JuniorHit</span>
+            <span>CourtMatch</span>
           </div>
         </Link>
 
@@ -48,7 +48,7 @@ export default function UnsubscribePage() {
               Unsubscribed
             </h1>
             <p className="text-slate-500">
-              You've been unsubscribed from <strong>{label}</strong> from JuniorHit.
+              You've been unsubscribed from <strong>{label}</strong> from CourtMatch.
             </p>
             <p className="text-sm text-slate-400">
               You can re-enable email notifications at any time in your profile settings.

@@ -45,7 +45,7 @@ function buildIcs(session: any, partnerName: string): string {
     `DTSTAMP:${icsDate(new Date())}`,
     `DTSTART:${icsDate(start)}`,
     `DTEND:${icsDate(end)}`,
-    `SUMMARY:JuniorHit: Hit with ${partnerName}`,
+    `SUMMARY:CourtMatch: Hit with ${partnerName}`,
     loc ? `LOCATION:${loc.replace(/\n/g, "\\n")}` : "",
     `DESCRIPTION:${desc}`,
     "END:VEVENT",
@@ -65,7 +65,7 @@ function buildGoogleCalUrl(session: any, partnerName: string): string {
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: `JuniorHit: Hit with ${partnerName}`,
+    text: `CourtMatch: Hit with ${partnerName}`,
     dates: `${icsDate(start)}/${icsDate(end)}`,
     details,
     ...(loc ? { location: loc } : {}),
@@ -163,7 +163,7 @@ export default function SessionDetail() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `juniorhit-${partnerName.replace(/\s+/g, "-")}.ics`;
+    a.download = `courtmatch-${partnerName.replace(/\s+/g, "-")}.ics`;
     a.click();
     URL.revokeObjectURL(url);
   }

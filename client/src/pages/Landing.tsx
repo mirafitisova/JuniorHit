@@ -8,8 +8,9 @@ import {
   Shield, Star, CheckCircle, ChevronDown, Users, Mail,
   Zap, Lock, Eye,
 } from "lucide-react";
-import courtHero from "@assets/generated_images/tennis_court_hero.png";
 import aerialCourt from "@assets/stock_images/aerial_view_of_a_pro_e8ebce63.jpg";
+
+const courtHero = "https://images.unsplash.com/photo-1478327130949-c96cb25ee9c4?w=1920&q=85&fit=crop&auto=format";
 
 // ── Count-up hook ─────────────────────────────────────────────────────────────
 
@@ -69,7 +70,7 @@ function Navbar() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
         <div className={`flex items-center gap-2 font-display font-bold text-xl transition-colors ${scrolled ? "text-primary" : "text-white"}`}>
           <Trophy className={`w-6 h-6 transition-colors ${scrolled ? "text-accent" : "text-accent"}`} />
-          <span>JuniorHit</span>
+          <span>CourtMatch</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/auth">
@@ -141,7 +142,7 @@ export default function Landing() {
             <motion.div variants={fadeUp}>
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/20 text-accent text-sm font-bold border border-accent/30 mb-2">
                 <Zap className="w-3.5 h-3.5" />
-                Southern California · Ages 13–18
+                Open to all players · Great for juniors
               </span>
             </motion.div>
 
@@ -157,8 +158,8 @@ export default function Landing() {
               variants={fadeUp}
               className="text-lg sm:text-xl text-white/75 max-w-2xl mx-auto leading-relaxed"
             >
-              JuniorHit connects junior tennis players with practice partners at their skill level.
-              Verified UTR ratings. Parent-approved safety. Courts near you.
+              CourtMatch connects tennis players with practice partners at their skill level.
+              Verified UTR ratings. Parent-approved safety for juniors. Courts near you.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
@@ -281,7 +282,7 @@ export default function Landing() {
           <div className="grid grid-cols-3 gap-6 md:gap-12">
             <StatNumber
               target={publicStats?.playerCount ?? 0}
-              label="players in SoCal"
+              label="players on CourtMatch"
             />
             <StatNumber
               target={publicStats?.sessionCount ?? 0}
@@ -395,10 +396,10 @@ export default function Landing() {
               <h3 className="text-xl font-bold text-slate-900 mb-2">Are you a high school tennis coach?</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
                 Help your players find practice partners outside of team practice.
-                JuniorHit is free for players and designed to complement your coaching program.
+                CourtMatch is free for players and designed to complement your coaching program.
               </p>
             </div>
-            <a href="mailto:hello@juniorhit.com" className="shrink-0">
+            <a href="mailto:hello@courtmatch.com" className="shrink-0">
               <Button variant="outline" className="rounded-xl border-primary/30 text-primary hover:bg-primary/5 gap-2">
                 <Mail className="w-4 h-4" />
                 Contact us
@@ -416,10 +417,10 @@ export default function Landing() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 font-display font-bold text-xl text-white mb-3">
                 <Trophy className="w-6 h-6 text-accent" />
-                <span>JuniorHit</span>
+                <span>CourtMatch</span>
               </div>
               <p className="text-sm text-slate-500 leading-relaxed">
-                The hitting partner platform for junior tennis players in Southern California.
+                The hitting partner platform for tennis players everywhere — especially juniors.
               </p>
             </div>
 
@@ -438,7 +439,7 @@ export default function Landing() {
               <p className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-4">Safety</p>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/safety-guidelines" className="hover:text-white transition-colors">Safety Guidelines</Link></li>
-                <li><a href="mailto:hello@juniorhit.com" className="hover:text-white transition-colors">Report an Issue</a></li>
+                <li><a href="mailto:hello@courtmatch.com" className="hover:text-white transition-colors">Report an Issue</a></li>
               </ul>
             </div>
 
@@ -446,14 +447,14 @@ export default function Landing() {
             <div>
               <p className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-4">Contact</p>
               <ul className="space-y-2 text-sm">
-                <li><a href="mailto:hello@juniorhit.com" className="hover:text-white transition-colors">hello@juniorhit.com</a></li>
+                <li><a href="mailto:hello@courtmatch.com" className="hover:text-white transition-colors">hello@courtmatch.com</a></li>
                 <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <p>© {new Date().getFullYear()} JuniorHit. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} CourtMatch. All rights reserved.</p>
             <p className="text-slate-500 italic">Made by a junior tennis player 🎾</p>
           </div>
         </div>

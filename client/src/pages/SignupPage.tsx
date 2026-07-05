@@ -116,7 +116,7 @@ export default function SignupPage() {
             <CardDescription>
               {referralCode
                 ? "You were invited! Create your account to get started."
-                : "Join JuniorHit to find hitting partners near you"}
+                : "Join CourtMatch to find hitting partners near you"}
             </CardDescription>
             {referralCode && (
               <div className="mt-3 rounded-xl bg-primary/8 border border-primary/20 px-4 py-2.5 text-sm text-primary font-medium">
