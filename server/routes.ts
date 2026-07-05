@@ -13,7 +13,7 @@ import {
   sendReengagement5d, sendReengagement10d, sendReengagement14d,
   sendStreakWarning,
 } from "./email";
-import { registerAdminRoutes } from "./adminRoutes";
+import { registerAdminRoutes, requireAdmin } from "./adminRoutes";
 import { registerSearchRoutes } from "./searchRoutes";
 import { haversineDistanceMiles, resolveCoords } from "@shared/lib/geo";
 import { weeklyAvailability, playerProfiles, courts } from "@shared/models/tennis";
@@ -104,10 +104,15 @@ export async function registerRoutes(
 
   // Player Profile (extended tennis schema)
   app.get("/api/player-profile", isAuthenticated, async (req, res) => {
-    const userId = (req.session as any).userId;
-    const profile = await storage.getPlayerProfile(userId);
-    if (!profile) return res.status(404).json({ message: "Not found" });
-    res.json(profile);
+    try {
+      const userId = (req.session as any).userId;
+      const profile = await storage.getPlayerProfile(userId);
+      if (!profile) return res.status(404).json({ message: "Not found" });
+      res.json(profile);
+    } catch (err) {
+      console.error("GET /api/player-profile error:", err);
+      res.status(500).json({ message: "Failed to load profile" });
+    }
   });
 
   app.put("/api/player-profile", isAuthenticated, async (req, res) => {
@@ -130,9 +135,14 @@ export async function registerRoutes(
 
   // Weekly Availability
   app.get("/api/weekly-availability", isAuthenticated, async (req, res) => {
-    const userId = (req.session as any).userId;
-    const rows = await storage.getWeeklyAvailability(userId);
-    res.json(rows);
+    try {
+      const userId = (req.session as any).userId;
+      const rows = await storage.getWeeklyAvailability(userId);
+      res.json(rows);
+    } catch (err) {
+      console.error("GET /api/weekly-availability error:", err);
+      res.status(500).json({ message: "Failed to load availability" });
+    }
   });
 
   app.put("/api/weekly-availability", isAuthenticated, async (req, res) => {
@@ -158,21 +168,29 @@ export async function registerRoutes(
   });
 
   app.get(api.profiles.list.path, isAuthenticated, async (req, res) => {
-    const filters = {
+    try {
+      const filters = {
         search: req.query.search as string,
         minUtr: req.query.minUtr ? Number(req.query.minUtr) : undefined,
         maxUtr: req.query.maxUtr ? Number(req.query.maxUtr) : undefined,
-    };
-    const profiles = await storage.getProfiles(filters);
-    res.json(profiles);
+      };
+      const profiles = await storage.getProfiles(filters);
+      res.json(profiles);
+    } catch (err) {
+      console.error("GET /api/profiles error:", err);
+      res.status(500).json({ message: "Failed to load profiles" });
+    }
   });
 
   app.get(api.profiles.get.path, isAuthenticated, async (req, res) => {
-    const profile = await storage.getProfile(req.params.userId);
-    if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+    try {
+      const profile = await storage.getProfile(req.params.userId);
+      if (!profile) return res.status(404).json({ message: "Profile not found" });
+      res.json(profile);
+    } catch (err) {
+      console.error("GET /api/profiles/:userId error:", err);
+      res.status(500).json({ message: "Failed to load profile" });
     }
-    res.json(profile);
   });
 
   app.put(api.profiles.update.path, isAuthenticated, async (req, res) => {
@@ -192,10 +210,38 @@ export async function registerRoutes(
     }
   });
 
+  // ── Favorites ─────────────────────────────────────────────────────────────────
+  app.get("/api/favorites", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.session as any).userId;
+      const ids = await storage.getFavoriteIds(userId);
+      res.json({ favoriteIds: ids });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to load favorites" });
+    }
+  });
+
+  app.post("/api/favorites/:targetUserId", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.session as any).userId;
+      const { targetUserId } = req.params;
+      if (userId === targetUserId) return res.status(400).json({ message: "Cannot favorite yourself" });
+      const result = await storage.toggleFavorite(userId, targetUserId);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to toggle favorite" });
+    }
+  });
+
   app.get(api.hitRequests.list.path, isAuthenticated, async (req, res) => {
-     const userId = (req.session as any).userId;
-     const requests = await storage.getHitRequests(userId);
-     res.json(requests);
+    try {
+      const userId = (req.session as any).userId;
+      const requests = await storage.getHitRequests(userId);
+      res.json(requests);
+    } catch (err) {
+      console.error("GET hit-requests error:", err);
+      res.status(500).json({ message: "Failed to load requests" });
+    }
   });
 
   app.post(api.hitRequests.create.path, isAuthenticated, async (req, res) => {
@@ -270,7 +316,11 @@ export async function registerRoutes(
         );
       }
     } catch (err) {
-      res.status(400).json({ message: "Invalid update" });
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("PATCH hit-requests status error:", err);
+      res.status(500).json({ message: "Failed to update status" });
     }
   });
 
@@ -611,9 +661,12 @@ export async function registerRoutes(
   // ── Session reminder cron (Render cron job hits this every 30 min) ────────────
   app.post("/api/cron/session-reminders", async (req, res) => {
     const secret = process.env.CRON_SECRET;
-    if (secret) {
-      const auth = req.headers.authorization;
-      if (auth !== `Bearer ${secret}`) return res.status(401).json({ message: "Unauthorized" });
+    const auth = req.headers.authorization;
+    if (secret && auth !== `Bearer ${secret}`) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!secret && process.env.NODE_ENV !== "development") {
+      return res.status(401).json({ message: "CRON_SECRET not configured" });
     }
     try {
       const now = new Date();
@@ -714,8 +767,12 @@ export async function registerRoutes(
   // ── Re-engagement cron (runs daily at 6 PM PT via Render cron) ───────────────
   app.post("/api/cron/re-engagement", async (req, res) => {
     const secret = process.env.CRON_SECRET;
-    if (secret && req.headers.authorization !== `Bearer ${secret}`) {
+    const auth = req.headers.authorization;
+    if (secret && auth !== `Bearer ${secret}`) {
       return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!secret && process.env.NODE_ENV !== "development") {
+      return res.status(401).json({ message: "CRON_SECRET not configured" });
     }
     try {
       const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
@@ -837,21 +894,16 @@ export async function registerRoutes(
   });
 
   // ── Admin: broadcasts ─────────────────────────────────────────────────────────
-  app.get("/api/admin/broadcasts", isAuthenticated, async (req, res) => {
+  app.get("/api/admin/broadcasts", requireAdmin, async (_req, res) => {
     try {
-      const userId = (req.session as any).userId;
-      const [u] = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId)).limit(1);
-      if (!u?.isAdmin) return res.status(403).json({ message: "Forbidden" });
       const broadcasts = await storage.getBroadcasts();
       res.json(broadcasts);
     } catch (err) { res.status(500).json({ message: "Failed" }); }
   });
 
-  app.post("/api/admin/broadcasts", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/broadcasts", requireAdmin, async (req, res) => {
     try {
       const userId = (req.session as any).userId;
-      const [u] = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId)).limit(1);
-      if (!u?.isAdmin) return res.status(403).json({ message: "Forbidden" });
       const { title, body, areaFilter, scheduledAt } = req.body;
       if (!title || !body || !scheduledAt) return res.status(400).json({ message: "title, body, scheduledAt required" });
       const broadcast = await storage.createBroadcast({
@@ -861,11 +913,8 @@ export async function registerRoutes(
     } catch (err) { res.status(500).json({ message: "Failed" }); }
   });
 
-  app.post("/api/admin/broadcasts/:id/send", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/broadcasts/:id/send", requireAdmin, async (req, res) => {
     try {
-      const userId = (req.session as any).userId;
-      const [u] = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId)).limit(1);
-      if (!u?.isAdmin) return res.status(403).json({ message: "Forbidden" });
       const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
       const count = await storage.sendBroadcast(Number(req.params.id), baseUrl);
       res.json({ sent: count });
@@ -874,11 +923,8 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/admin/broadcasts/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/admin/broadcasts/:id", requireAdmin, async (req, res) => {
     try {
-      const userId = (req.session as any).userId;
-      const [u] = await db.select({ isAdmin: users.isAdmin }).from(users).where(eq(users.id, userId)).limit(1);
-      if (!u?.isAdmin) return res.status(403).json({ message: "Forbidden" });
       const { broadcastNotifications } = await import("@shared/schema");
       await db.delete(broadcastNotifications).where(eq(broadcastNotifications.id, Number(req.params.id)));
       res.json({ ok: true });

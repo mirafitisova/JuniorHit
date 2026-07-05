@@ -9,7 +9,7 @@ import {
   type BroadcastNotification,
 } from "@shared/schema";
 import {
-  playerProfiles, weeklyAvailability, courts,
+  playerProfiles, weeklyAvailability, courts, favorites,
   type PlayerProfile, type InsertPlayerProfile,
   type WeeklyAvailability, type InsertWeeklyAvailability,
 } from "@shared/models/tennis";
@@ -98,6 +98,10 @@ export interface IStorage {
   getPlayerStats(userId: string): Promise<PlayerStats>;
   getSessionHistory(userId: string): Promise<SessionHistoryItem[]>;
   getPublicStats(): Promise<{ playerCount: number; sessionCount: number; courtCount: number }>;
+
+  // Favorites
+  getFavoriteIds(userId: string): Promise<string[]>;
+  toggleFavorite(userId: string, targetUserId: string): Promise<{ favorited: boolean }>;
 
   // Court reviews
   submitCourtReview(data: InsertCourtReview): Promise<CourtReview>;
@@ -485,6 +489,23 @@ export class DatabaseStorage implements IStorage {
 
   async markRatingNotificationSent(id: number): Promise<void> {
     await db.update(hitRequests).set({ ratingNotifiedAt: new Date() }).where(eq(hitRequests.id, id));
+  }
+
+  async getFavoriteIds(userId: string): Promise<string[]> {
+    const rows = await db.select({ favoriteUserId: favorites.favoriteUserId })
+      .from(favorites).where(eq(favorites.userId, userId));
+    return rows.map(r => r.favoriteUserId);
+  }
+
+  async toggleFavorite(userId: string, targetUserId: string): Promise<{ favorited: boolean }> {
+    const inserted = await db.insert(favorites)
+      .values({ userId, favoriteUserId: targetUserId })
+      .onConflictDoNothing()
+      .returning({ id: favorites.id });
+    if (inserted.length > 0) return { favorited: true };
+    await db.delete(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.favoriteUserId, targetUserId)));
+    return { favorited: false };
   }
 
   async submitCourtReview(data: InsertCourtReview): Promise<CourtReview> {

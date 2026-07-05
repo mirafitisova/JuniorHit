@@ -17,6 +17,7 @@ import SignupSuccess from "@/pages/SignupSuccess";
 import SafetyGuidelines from "@/pages/SafetyGuidelines";
 import ParentApprovePage from "@/pages/ParentApprovePage";
 import CourtsAdmin from "@/pages/admin/CourtsAdmin";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 import ProfileSetupWizard from "@/pages/ProfileSetupWizard";
 import Search from "@/pages/Search";
 import PlayerProfile from "@/pages/PlayerProfile";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/sessions" component={Sessions} />
       <Route path="/invite/:code" component={InvitePage} />
       <Route path="/unsubscribe" component={UnsubscribePage} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/notifications" component={NotificationsAdmin} />
       <Route path="/profile/setup" component={ProfileSetupWizard} />
       <Route path="/profile-setup" component={ProfileSetup} />

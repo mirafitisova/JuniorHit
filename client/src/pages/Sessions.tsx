@@ -168,9 +168,9 @@ export default function Sessions() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <Select value={monthFilter} onValueChange={setMonthFilter}>
-              <SelectTrigger className="w-44 rounded-xl bg-white border shadow-sm text-sm">
+              <SelectTrigger className="rounded-xl bg-white border shadow-sm text-sm">
                 <SelectValue placeholder="All months" />
               </SelectTrigger>
               <SelectContent>
@@ -182,7 +182,7 @@ export default function Sessions() {
             </Select>
 
             <Select value={partnerFilter} onValueChange={setPartnerFilter}>
-              <SelectTrigger className="w-44 rounded-xl bg-white border shadow-sm text-sm">
+              <SelectTrigger className="rounded-xl bg-white border shadow-sm text-sm">
                 <SelectValue placeholder="All partners" />
               </SelectTrigger>
               <SelectContent>
@@ -193,19 +193,17 @@ export default function Sessions() {
               </SelectContent>
             </Select>
 
-            {courtsUsed.length > 0 && (
-              <Select value={courtFilter} onValueChange={setCourtFilter}>
-                <SelectTrigger className="w-48 rounded-xl bg-white border shadow-sm text-sm">
-                  <SelectValue placeholder="All courts" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All courts</SelectItem>
-                  {courtsUsed.map(([id, name]) => (
-                    <SelectItem key={id} value={id}>{name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <Select value={courtFilter} onValueChange={setCourtFilter}>
+              <SelectTrigger className="rounded-xl bg-white border shadow-sm text-sm">
+                <SelectValue placeholder="All courts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All courts</SelectItem>
+                {courtsUsed.map(([id, name]) => (
+                  <SelectItem key={id} value={id}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Session list */}

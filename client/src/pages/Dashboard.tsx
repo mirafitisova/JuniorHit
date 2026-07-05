@@ -132,27 +132,27 @@ export default function Dashboard() {
 
           {/* Quick stats */}
           {stats && (stats.totalSessions > 0 || stats.streak > 0) && (
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white rounded-2xl border shadow-sm p-4 flex items-center gap-3">
-                <Flame className="w-7 h-7 text-orange-500 shrink-0" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="bg-white rounded-2xl border shadow-sm p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3 text-center sm:text-left">
+                <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500 shrink-0" />
                 <div>
-                  <p className="text-2xl font-display font-bold text-primary leading-none">{stats.streak}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">week streak</p>
+                  <p className="text-xl sm:text-2xl font-display font-bold text-primary leading-none">{stats.streak}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">wk streak</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl border shadow-sm p-4 flex items-center gap-3">
-                <Calendar className="w-7 h-7 text-primary shrink-0" />
+              <div className="bg-white rounded-2xl border shadow-sm p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3 text-center sm:text-left">
+                <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0" />
                 <div>
-                  <p className="text-2xl font-display font-bold text-primary leading-none">{stats.sessionsThisMonth}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">this month</p>
+                  <p className="text-xl sm:text-2xl font-display font-bold text-primary leading-none">{stats.sessionsThisMonth}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">this month</p>
                 </div>
               </div>
               <Link href="/sessions">
-                <div className="bg-white rounded-2xl border shadow-sm p-4 flex items-center gap-3 cursor-pointer hover:border-primary/30 transition-colors">
-                  <History className="w-7 h-7 text-accent shrink-0" />
+                <div className="bg-white rounded-2xl border shadow-sm p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3 text-center sm:text-left cursor-pointer hover:border-primary/30 transition-colors">
+                  <History className="w-6 h-6 sm:w-7 sm:h-7 text-accent shrink-0" />
                   <div>
-                    <p className="text-2xl font-display font-bold text-primary leading-none">{stats.totalSessions}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">total</p>
+                    <p className="text-xl sm:text-2xl font-display font-bold text-primary leading-none">{stats.totalSessions}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">total</p>
                   </div>
                 </div>
               </Link>

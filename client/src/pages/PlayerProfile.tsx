@@ -1,15 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import {
   ArrowLeft, BadgeCheck, School, Locate, MapPin,
-  Clock, Users, ChevronRight, AlertTriangle, Star,
+  Clock, Users, ChevronRight, AlertTriangle, Star, Heart,
 } from "lucide-react";
 import { CreateRequestModal } from "@/components/CreateRequestModal";
 import type { ProfileWithUser } from "@shared/schema";
 import { usePlayerStats } from "@/hooks/use-stats";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -245,6 +246,20 @@ export default function PlayerProfile() {
   });
 
   const { data: playerStats } = usePlayerStats(params.id ?? "");
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const { data: favData } = useQuery<{ favoriteIds: string[] }>({
+    queryKey: ["/api/favorites"],
+    queryFn: () => apiRequest("GET", "/api/favorites").then(r => r.json()),
+  });
+  const isFavorited = favData?.favoriteIds.includes(params.id ?? "") ?? false;
+  const toggleFav = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/favorites/${params.id}`, {}).then(r => r.json()),
+    onSuccess: (data: { favorited: boolean }) => {
+      qc.invalidateQueries({ queryKey: ["/api/favorites"] });
+      toast({ title: data.favorited ? "Added to favorites" : "Removed from favorites" });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -424,25 +439,39 @@ export default function PlayerProfile() {
           )}
 
           {/* CTA */}
-          <div className="mt-4 pt-4 border-t border-slate-100">
-            <CreateRequestModal
-              receiver={{
-                id: 0,
-                userId: player.userId,
-                utrRating: player.utrRating,
-                bio: player.bio,
-                location: null,
-                availability: null,
-                createdAt: null,
-                user: { firstName: player.firstName, lastName: player.lastInitial, profileImageUrl: null },
-              } as ProfileWithUser}
-              trigger={
-                <Button className="w-full">
-                  Send Hit Request
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              }
-            />
+          <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+            <button
+              onClick={() => toggleFav.mutate()}
+              disabled={toggleFav.isPending}
+              className={`shrink-0 w-11 h-11 rounded-xl border flex items-center justify-center transition-colors ${
+                isFavorited
+                  ? "bg-red-50 border-red-200 text-red-500"
+                  : "bg-slate-50 border-slate-200 text-slate-400 hover:text-red-400 hover:border-red-200"
+              }`}
+              aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart className={`w-5 h-5 ${isFavorited ? "fill-red-500" : ""}`} />
+            </button>
+            <div className="flex-1">
+              <CreateRequestModal
+                receiver={{
+                  id: 0,
+                  userId: player.userId,
+                  utrRating: player.utrRating,
+                  bio: player.bio,
+                  location: null,
+                  availability: null,
+                  createdAt: null,
+                  user: { firstName: player.firstName, lastName: player.lastInitial, profileImageUrl: null },
+                } as ProfileWithUser}
+                trigger={
+                  <Button className="w-full">
+                    Send Hit Request
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                }
+              />
+            </div>
           </div>
         </div>
 
