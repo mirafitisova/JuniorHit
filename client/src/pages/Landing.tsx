@@ -8,9 +8,9 @@ import {
   Shield, Star, CheckCircle, ChevronDown, Users, Mail,
   Zap, Lock, Eye,
 } from "lucide-react";
-import aerialCourt from "@assets/stock_images/aerial_view_of_a_pro_e8ebce63.jpg";
 
 const courtHero = "https://images.unsplash.com/photo-1478327130949-c96cb25ee9c4?w=1920&q=85&fit=crop&auto=format";
+const aerialCourt = "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=1200&q=85&fit=crop&auto=format";
 
 // ── Count-up hook ─────────────────────────────────────────────────────────────
 
@@ -328,7 +328,7 @@ export default function Landing() {
             >
               <img
                 src={aerialCourt}
-                alt="Tennis courts aerial view"
+                alt="Junior tennis player practicing on a public court"
                 className="w-full h-72 md:h-96 object-cover"
               />
             </motion.div>
